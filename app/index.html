@@ -57,12 +57,18 @@
                 <a ui-sref="messages"><span class="item-menu-size"><i class="ion-email"></i><i class="{{}}"></i>  <strong>Messages</strong></span></a>
               </li>
               <li class="main-theme-font-color item-menu-size" ng-class="activeClasses[3]">
-                <a ui-sref="requests"><span class="item-menu-size"><i class="ion-log-in"></i> <strong>Requests</strong></span></a>
+                <a ui-sref="requests"><span class="item-menu-size"><i class="ion-ios-information"></i> <strong>Requests</strong></span></a>
               </li>
               <li class="main-theme-font-color item-menu-size" ng-class="activeClasses[4]"><a ui-sref="account"><span class="item-menu-size"><i class="ion-gear-a"></i>  <strong>Account</strong></span></a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-        <li ng-show="currentUser"><a ui-sref="account"><span class="item-menu-size" ><i class="ion-person"></i></span><span > {{currentUser}}</span></a></li>
+            <li ng-show="currentUser" class="dropdown" >
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="item-menu-size" ><i class="ion-person"></i></span><span > {{currentUser}}</span><span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li align="center"><a ui-sref="account"><span class="item-menu-size"><i class="ion-gear-a"></i></span> Account</a></li>
+                  <li align="center"><a ui-sref="account"><span class="item-menu-size" ><i class="ion-log-out"></i></span> Logout</a></li>
+                </ul>
+            </li>
         <li ng-hide="currentUser"><a ui-sref="account"><span class="item-menu-size" ><i class="ion-person"></i></span><span > Log In</span></a></li>
           </div>
         </div>
