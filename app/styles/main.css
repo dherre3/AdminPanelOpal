@@ -1,0 +1,63 @@
+
+body {
+  padding: 0;
+  background-color: white;
+}
+
+
+
+
+/* Responsive: Portrait tablets and up */
+@media screen and (min-width: 768px) {
+  .container {
+    max-width: 730px;
+  }
+
+  /* Remove the padding we set earlier */
+  .header,
+  .marketing,
+  .footer {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  /* Space out the masthead */
+  .header {
+    margin-bottom: 30px;
+  }
+  /* Remove the bottom border on the jumbotron for visual effect */
+  .jumbotron {
+    border-bottom: 0;
+  }
+}
+/*
+*Css starts here for app really starts here!!!!!!!
+*
+*
+*/
+/*Index menu and color theme*/
+
+.main-theme-font-color{
+  color:#2B6197;
+}
+.main-theme-background-color{
+  background-color: #EBEBEA;
+}
+.item-menu-size{
+  font-size:15px;
+  color:#2B6197;
+}
+
+.main-div-container{
+
+  margin:0 auto;
+  margin-top:-10px;
+  min-height:65vh;
+  width:90vw;
+  border:1px solid lightgrey;
+  background-color: #fbfbfb;
+  border-radius: 4px;
+}
+
+
+
+}

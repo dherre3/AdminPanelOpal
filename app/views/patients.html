@@ -1,0 +1,41 @@
+<div class="main-div-container">
+<uib-tabset>
+        <uib-tab>
+
+        <tab-heading>
+            <i class="ion-ios-search-strong" style="font-size:20px"></i> Search Patient
+        </tab-heading>
+        <div align="center">
+        <br>
+        <p> <span class="glyphicon glyphicon-search"></span> - <strong>Use Patient I.D. number or Last Name to search :</strong></p>
+        <div ng-controller="SearchPatientController">
+        <div style="width:250px">
+            <div class="input-group">
+              <span class="input-group-addon" id="basic-addon1">Patient ID#</span>
+              <input type="text" ng-model="PatientId" class='form-control' ng-change="FindPatient()" ng-model-options="{debounce: 750}">
+            </div>
+            <br>
+            <div class="input-group">
+            <span class="input-group-addon" id="basic-addon1"> Last Name</span>
+            <input type="text" ng-model="LastName" class="form-control" ng-change="FindPatient()" ng-model-options="{debounce: 750}">
+            </div>
+            <br>
+            <button style="width:100%" class="btn btn-info" ng-click="findPatient()">Search</button>
+            <br>
+            <uib-alert ng-show="!alerts" ng-repeat='alert in alerts' type="{{alert.type}}"><h3>{{alert.message}}</h3></uib-alert>
+
+            </div>
+        </div>
+        </div>
+        </uib-tab>
+         <uib-tab>
+        <tab-heading>
+            <i class="ion-ios-search-strong" style="font-size:20px"></i> All Patients
+        </tab-heading>
+        <div ng-controller="ListAllPatientsController">
+        <p> <span class="glyphicon glyphicon-search"></span> - <strong>Use Patient I.D. number or Last name to search :</strong></p>
+        </div>
+        </uib-tab>
+        </uib-tabset>
+  
+</div>
