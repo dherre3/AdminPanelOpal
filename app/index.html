@@ -51,7 +51,7 @@
                 <a ui-sref="home"><span class="item-menu-size"><i class="ion-home"></i> <strong>Home</strong></span></a>
               </li>
               <li class="main-theme-font-color item-menu-size" ng-class="activeClasses[1]">
-                <a ui-sref="patients"><span class="item-menu-size"><i class="ion-ios-people" ></i> <strong>Patients</strong></span></a>
+                <a ui-sref="patients.search-patients"><span class="item-menu-size"><i class="ion-ios-people" ></i> <strong>Patients</strong></span></a>
               </li>
               <li class="main-theme-font-color item-menu-size" ng-class="activeClasses[2]">
                 <a ui-sref="messages"><span class="item-menu-size"><i class="ion-email"></i><i class="{{}}"></i>  <strong>Messages</strong></span></a>
@@ -63,7 +63,7 @@
             </ul>
             <ul class="nav navbar-nav navbar-right">
             <li ng-show="currentUser" class="dropdown" >
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="item-menu-size" ><i class="ion-person"></i></span><span > {{currentUser}}</span><span class="caret"></span></a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="item-menu-size" ><i class="ion-person"></i></span><span > {{currentUser.LastName}}</span><span class="caret"></span></a>
                 <ul class="dropdown-menu">
                   <li align="center"><a ui-sref="account"><span class="item-menu-size"><i class="ion-gear-a"></i></span> Account</a></li>
                   <li align="center"><a ui-sref="account"><span class="item-menu-size" ><i class="ion-log-out"></i></span> Logout</a></li>
@@ -117,19 +117,30 @@
     <!-- endbuild -->
 
         <!-- build:js({.tmp,app}) scripts/scripts.js -->
+        <!--Routing, app init, run loop-->
         <script src="scripts/app.js"></script>
+
+        <!--Controller-->
         <script src="scripts/controllers/main.js"></script>
         <script src="scripts/controllers/about.js"></script>
-        <script src="scripts/controllers/MainController.js"></script>
+       
         <script src="scripts/controllers/LoginModalController.js"></script>
         <script src="scripts/controllers/AccountController.js"></script>
-        <script src="scripts/controllers/SearchPatientController.js"></script>
+        <script src="scripts/controllers/SearchPatientsController.js"></script>
+        <script src="scripts/controllers/SearchController.js"></script>
         <script src="scripts/controllers/ListAllPatientsController.js"></script>
-
+        <script src="scripts/controllers/IndividualPatientController.js"></script>
+         <script src="scripts/controllers/MainController.js"></script>
         <script src="scripts/controllers/MessagesController.js"></script>
         <script src="scripts/controllers/PatientsController.js"></script>
-
         <script src="scripts/controllers/RequestsController.js"></script>
+        <script src="scripts/controllers/patient.js"></script>
+
+        <!--services-->
+        <script src="scripts/services/API.js"></script>
+        <!--filters-->
+        <script src="scripts/filters.js"></script>
+
 
         <!-- endbuild -->
 </body>

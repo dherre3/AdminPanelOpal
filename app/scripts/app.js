@@ -35,6 +35,7 @@ app.config(['$urlRouterProvider', '$stateProvider', function ($urlRouterProvider
       url:'/patients',
       templateUrl:'views/patients.html',
       controller:'PatientsController',
+      abstract:true,
       data:{
         requireLogin:true
       }
@@ -51,6 +52,80 @@ app.config(['$urlRouterProvider', '$stateProvider', function ($urlRouterProvider
       url:'/requests',
       templateUrl:'views/requests.html',
       controller:'RequestsController',
+      data:{
+        requireLogin:true
+      }
+    })
+    .state('patients.search-patients',{
+      url:'/search-patients',
+      templateUrl:'templates/patients/search-patients.html',
+      controller:'SearchPatientsController',
+      data:{
+        requireLogin:true
+      }
+    })
+    .state('patients.patient',{
+      url:'/patient',
+      templateUrl:'templates/patients/individual-patient.html',
+      controller:'IndividualPatientController',
+      abstract:true,
+      data:{
+        requireLogin:true
+      }
+    })
+    .state('patients.patient.general',{
+      url:'/general',
+      templateUrl:'templates/individual-patient/patient-general.html',
+      controller:'GeneralPatientController',
+      data:{
+        requireLogin:true
+      }
+    })
+    .state('patients.patient.doctors',{
+      url:'/doctors',
+      templateUrl:'templates/individual-patient/patient-doctors.html',
+      controller:'DoctorsPatientController',
+      data:{
+        requireLogin:true
+      }
+    })
+    .state('patients.patient.appointments',{
+      url:'/appointments',
+      templateUrl:'templates/individual-patient/patient-appointments.html',
+      controller:'AppointmentsPatientController',
+      data:{
+        requireLogin:true
+      }
+    })
+    .state('patients.patient.treatmentplan',{
+      url:'/treatmentplan',
+      templateUrl:'templates/individual-patient/patient-treatmentplan.html',
+      controller:'TreatmentPlanPatientController',
+      data:{
+        requireLogin:true
+      }
+    })
+
+    .state('patients.patient.documents',{
+      url:'/documents',
+      templateUrl:'templates/individual-patient/patient-documents.html',
+      controller:'DocumentsPatientController',
+      data:{
+        requireLogin:true
+      }
+    })
+     .state('patients.patient.messages',{
+      url:'/messages',
+      templateUrl:'templates/individual-patient/patient-messages.html',
+      controller:'MessagesPatientController',
+      data:{
+        requireLogin:true
+      }
+    })
+     .state('patients.patient.requests',{
+      url:'/requests',
+      templateUrl:'templates/individual-patient/patient-requests.html',
+      controller:'RequestsPatientController',
       data:{
         requireLogin:true
       }
@@ -119,12 +194,29 @@ app.run(function ($rootScope, $state,LoginModal,$timeout)
             $rootScope.activeClasses=['','','','active',''];
           }else if(tab=='account'){
             $rootScope.activeClasses=['','','','','active'];
+          }
+          else if(tab=='patients.patient.general'){
+            $rootScope.activeClassesPatientMenu=['active','','','','','',''];
+          }else if(tab=='patients.patient.doctors'){
+            $rootScope.activeClassesPatientMenu=['','active','','','','',''];
+          }
+          else if(tab=='patients.patient.appointments'){
+            $rootScope.activeClassesPatientMenu=['','','active','','','',''];
+          }
+          else if(tab=='patients.patient.treatmentplan'){
+            $rootScope.activeClassesPatientMenu=['','','','active','','',''];
+          }
+          else if(tab=='patients.patient.documents'){
+            $rootScope.activeClassesPatientMenu=['','','','','active','',''];
+          }
+          else if(tab=='patients.patient.messages'){
+            $rootScope.activeClassesPatientMenu=['','','','','','active',''];
+          }
+          else if(tab=='patients.patient.requests'){
+            $rootScope.activeClassesPatientMenu=['','','','','','','active'];
           }else{
             $rootScope.activeClasses=['','active','','',''];
           }
-
-
-
       });
      
 

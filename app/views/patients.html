@@ -1,20 +1,3 @@
-<div class="main-div-container">
-<uib-tabset>
-        <uib-tab>
-
-        <tab-heading>
-            <i class="ion-ios-search-strong" style="font-size:20px"></i> Search Patient
-        </tab-heading>
-        <div ng-include src="'templates/patients/search-patients.html'"></div>
-        </uib-tab>
-         <uib-tab>
-        <tab-heading>
-            <i class="ion-ios-search-strong" style="font-size:20px"></i> All Patients
-        </tab-heading>
-        <div ng-controller="ListAllPatientsController">
-        <p> <span class="glyphicon glyphicon-search"></span> - <strong>Use Patient I.D. number or Last name to search :</strong></p>
-        </div>
-        </uib-tab>
-        </uib-tabset>
-  
+<div>
+<div ui-view></div>
 </div>

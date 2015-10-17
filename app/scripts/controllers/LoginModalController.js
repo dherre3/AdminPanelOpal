@@ -46,7 +46,7 @@ app.controller('LoginModalController',function ($scope, $modalInstance,$rootScop
           if ( response.AdminSerNum ||response.DoctorSerNum)
           {
             $rootScope.alerts["LoginAlert"]={};
-            $modalInstance.close(username);
+            $modalInstance.close(response);
             $rootScope.Admin=response;
           }
           else if (response == "InvalidCredentials")
