@@ -1,5 +1,5 @@
 var app=angular.module('adminPanelApp');
-app.controller('LoginModalController',function ($scope, $modalInstance,$rootScope,$http) {
+app.controller('LoginModalController',function ($scope, $modalInstance,$rootScope,$http,User) {
 
     /**
   * @ngdoc controller
@@ -42,10 +42,11 @@ app.controller('LoginModalController',function ($scope, $modalInstance,$rootScop
         $http.get("http://localhost:8888/qplus/AdminPanel-MySQLDB-NodeListener-Docs/php/Authenticate.php?Username='"+username+"'&Password="+password).success( function (response)
         {
           console.log(response);
-         
+
           if ( response.AdminSerNum ||response.DoctorSerNum)
           {
             $rootScope.alerts["LoginAlert"]={};
+            User.setUserFields(response);
             $modalInstance.close(response);
             $rootScope.Admin=response;
           }

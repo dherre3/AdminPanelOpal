@@ -17,7 +17,8 @@ var app=angular
     'ngSanitize',
     'ngTouch',
     'ui.router',
-    'ui.bootstrap'
+    'ui.bootstrap',
+    'luegg.directives'
   ]);
 app.config(['$urlRouterProvider', '$stateProvider', function ($urlRouterProvider, $stateProvider) {
       $urlRouterProvider.otherwise("/");
@@ -218,7 +219,7 @@ app.run(function ($rootScope, $state,LoginModal,$timeout)
             $rootScope.activeClasses=['','active','','',''];
           }
       });
-     
+
 
     }
     if (requireLogin && typeof $rootScope.currentUser === 'undefined')
@@ -236,7 +237,7 @@ app.run(function ($rootScope, $state,LoginModal,$timeout)
       });
 
     }
-    
+
   });
 
 

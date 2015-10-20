@@ -3,20 +3,21 @@
  <div class="panel panel-default" style="height:70vh; margin:0;padding:0">
  <div class="panel-body" style="margin:0;padding:0">
  <ul class="list">
-  <li class="list__item list__item--tappable">
-     <div class='row' ng-repeat="conversation in chat">
+  <li class="list__item" ng-class="(selectedIndex==$index)?'conversationSelected':''"ng-repeat="person in chat" ng-click="goToConversation($index)">
+     <div class='row' >
        <div class="col-xs-1" >
-      <div ng-show="conversation.ReadStatus==0">
+      <div ng-show="person.ReadStatus==0">
         <i class="icon ion-record" style="font-size:13px;color:CornflowerBlue "></i>
       </div>
        </div>
         <div class="col-xs-8">
-        <div style="font-size:15px" ><strong>{{conversation.ConversationPartnerFirstName}}   {{conversation.ConversationPartnerLastName}}</strong> <span style="color:lightgrey">Id #:{{conversation.PatientId}}</span></div>
-        <div style="color:lightgrey"><i class="icon ion-person" style="color:lightgrey"></i>&nbsp;{{conversation.Role}}, AriaSer:{{conversation.AriaSer}} </div>
+        <div style="font-size:15px" ><strong>{{person.ConversationPartnerFirstName}}   {{person.ConversationPartnerLastName}}</strong> <span style="color:grey">Id #:{{person.PatientId}}</span></div>
+        <div style="color:grey"><i class="icon ion-person" style="color:grey"></i>&nbsp;{{person.Role}}, AriaSer:{{person.AriaSer}} </div>
 
        </div>
         <div class="col-xs-2">
-        {{conversation.DateOfLastMessage|dateEmail}}
+
+      <!--  <div ng-show="conversation.DateOfLastMessage!==null">{{conversation.DateOfLastMessage|dateEmail}}</div>-->
        </div>
        </div>
   </li>
@@ -30,8 +31,8 @@
   <div class="panel-body" >
 
    <div style="overflow-y:scroll;height:50vh;overflow-x:hidden" scroll-glue-bottom="glue">
-      
-      <div  ng-repeat="mes in conversation" ng-init="(mes.Role=='1' ? messageName=user : messageName=messages[0].MessageRecipient)">
+      <div style="margin-top: 30px" align="center" ng-show="conversation.length==0"><h3>No messages!</h3></div>
+      <div  ng-repeat="mes in conversation">
            <br>
         <div style="height: 1px; background-color: #C1C1C1; text-align: center">
           <span style="font-size:12px;background-color: white; position: relative; top: -1.5em;color:#C1C1C1">
@@ -41,14 +42,15 @@
 <br>
         <div class="row" >
           <div class="col-xs-2 col-md-2 col-sm-2 col-lg-2" style="padding-right:1vw">
-              <img  style="border-radius:4px" width="40px" height="auto" ng-hide="mes.Role=='0'" ng-src="./img/doctor.png">
-              <img  width="40px" height="auto" ng-hide="mes.Role=='1'" ng-src="./img/patient.png">
-            
+              <img  style="border-radius:4px" width="40px" height="auto" ng-hide="mes.Role==1" ng-src="./img/doctor.png">
+              <img  width="40px" height="auto" ng-hide="mes.Role==0" ng-src="./img/patient.png">
+
           </div>
 
           <div class="col-xs-9 col-md-9 col-sm-9 col-lg-9" style="margin-left:-7%">
              <div  class="timline-from" >
-                <span class="timeline-name">{{messageName}}</span>
+                <span class="timeline-name" ng-show="mes.Role==1">{{user}}</span>
+                <span class="timeline-name" ng-show="mes.Role==0">{{chat[selectedIndex].ConversationPartnerFirstName}} {{chat[selectedIndex].ConversationPartnerLastName}}</span>
                 <span class="timeline-id">{{mes.Date|date:'h:mm a'}}</span>
               </div>
               <div  class="timeline-message ">
@@ -62,7 +64,7 @@
           </div>
         </div>
       </div>
-      
+
       </div>
 <div>
     <br>
@@ -77,16 +79,15 @@
   </div> <textarea ng-model="newMessage" style="margin-left:5%" class="textarea col-xs-8" rows="5"  placeholder="Message"></textarea>
       <div class="right">
         <div class="col-xs-1">
-          <button style="margin-left=1%" class="btn btn-primary" ng-disabled="sendButtonDisabled" ng-click="submitMessage()">Send</button>
+          <button style="margin-left=1%" class="btn btn-primary" ng-disabled="sendButtonDisabled" ng-click="sendMessage()">Send</button>
         </div>
       </div>
       </form>
-      
-  </div>
-  </div>
-  </div>
-  </div>
- 
-  
-</div>
 
+  </div>
+  </div>
+  </div>
+  </div>
+
+
+</div>

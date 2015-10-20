@@ -28,7 +28,7 @@
       <img class="img-responsive" src="./img/muhc-logo-text.png">
     <span style="color:#2E8AE6"><strong>Portal MUHC Oncology Patient Application</strong></span><br><br>
     </div>
-    
+
     <div class="header"  align="center">
       <div class="navbar navbar-default" role="navigation" style="width:85vw">
         <div class="container" align="center">
@@ -54,7 +54,7 @@
                 <a ui-sref="patients.search-patients"><span class="item-menu-size"><i class="ion-ios-people" ></i> <strong>Patients</strong></span></a>
               </li>
               <li class="main-theme-font-color item-menu-size" ng-class="activeClasses[2]">
-                <a ui-sref="messages"><span class="item-menu-size"><i class="ion-email"></i><i class="{{}}"></i>  <strong>Messages</strong></span></a>
+                <a ui-sref="messages"><span class="item-menu-size"><i class="ion-email"></i><i class="{{}}"></i>  <strong>Messages  <span class="badge" ng-show="NumberOfNewMessages!==0">{{NumberOfNewMessages}}</span></a></strong></span></a>
               </li>
               <li class="main-theme-font-color item-menu-size" ng-class="activeClasses[3]">
                 <a ui-sref="requests"><span class="item-menu-size"><i class="ion-ios-information"></i> <strong>Requests</strong></span></a>
@@ -106,6 +106,7 @@
     <script src="bower_components/angular-cookies/angular-cookies.js"></script>
     <script src="bower_components/angular-resource/angular-resource.js"></script>
     <script src="bower_components/angular-route/angular-route.js"></script>
+    <script src="bower_components/angular-scroll-glue/src/scrollglue.js"></script>
     <script src="bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
     <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
     <script src="bower_components/angular-touch/angular-touch.js"></script>
@@ -123,7 +124,7 @@
         <!--Controller-->
         <script src="scripts/controllers/main.js"></script>
         <script src="scripts/controllers/about.js"></script>
-       
+
         <script src="scripts/controllers/LoginModalController.js"></script>
         <script src="scripts/controllers/AccountController.js"></script>
         <script src="scripts/controllers/SearchPatientsController.js"></script>
