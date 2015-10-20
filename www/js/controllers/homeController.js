@@ -34,14 +34,12 @@ myApp.controller('HomeController', ['$state','Appointments', '$scope','Patient',
         $scope.dateToday=new Date();
         var date;
         var nextAppointment=Appointments.getNextAppointment();
-
+        var lastAppointment=Appointments.getLastAppointmentCompleted();
         if(nextAppointment.Index!=-1){
-            $scope.noNextAppointment=false;
-            $scope.NextAppointment=nextAppointment.Object;
-            console.log($scope.NextAppointment);
+            $scope.noAppointments=false;
+            $scope.appointmentShown=nextAppointment.Object;
+            $scope.titleAppointmentsHome='Next Appointment';
             date=nextAppointment.Object.ScheduledStartTime;
-            console.log(date);
-            console.log($scope.dateToday);
             var dateDay=date.getDate();
             var dateMonth=date.getMonth();
             var dateYear=date.getFullYear();
@@ -53,8 +51,13 @@ myApp.controller('HomeController', ['$state','Appointments', '$scope','Patient',
                 console.log('notToday');
                 $scope.nextAppointmentIsToday=false;
             }
-        }else{
-            $scope.noNextAppointment=true;
+        }else if(lastAppointment!=-1){
+          $scope.nextAppointmentIsToday=false;
+          $scope.appointmentShown=lastAppointment;
+          $scope.titleAppointmentsHome='Last Appointment';
+        }
+        else{
+            $scope.noAppointments=true;
         }
         $scope.Email=Patient.getEmail();
         $scope.FirstName = Patient.getFirstName();
