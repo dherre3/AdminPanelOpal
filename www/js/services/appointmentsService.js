@@ -48,7 +48,7 @@ myApp.service('Appointments', ['$q', 'RequestToServer','$cordovaCalendar','UserA
         {
             var r=$q.defer();
             var appointmentsString=window.localStorage.getItem('NativeCalendarAppoinments');
-            
+
             if(!appointmentsString){
                 r.reject(app);
             }else{
@@ -64,7 +64,7 @@ myApp.service('Appointments', ['$q', 'RequestToServer','$cordovaCalendar','UserA
                 }
                 r.reject(app);
             }
-          
+
             return r.promise;
         }
         function addEventToNativeCalendar(app){
@@ -81,7 +81,7 @@ myApp.service('Appointments', ['$q', 'RequestToServer','$cordovaCalendar','UserA
                 appointmentString=JSON.stringify(objectToLocalStorage);
                 window.localStorage.setItem('NativeCalendarAppoinments',appointmentString);
             }
-          
+
         }
     return {
 
@@ -145,7 +145,7 @@ myApp.service('Appointments', ['$q', 'RequestToServer','$cordovaCalendar','UserA
                 }
 
 
-                
+
                 //Sort Appointments chronologically most recent first
                 this.UserAppointmentsArray = $filter('orderBy')(this.UserAppointmentsArray, 'ScheduledStartTime', true);
                 this.PastAppointments=$filter('orderBy')(this.PastAppointments, 'ScheduledStartTime',true);
@@ -156,16 +156,21 @@ myApp.service('Appointments', ['$q', 'RequestToServer','$cordovaCalendar','UserA
                     for (var i = 0; i < keysArray.length; i++) {
                         if(this.NextAppointment.Object.AppointmentSerNum==this.UserAppointmentsArray[i].AppointmentSerNum)
                         {
-                           this.NextAppointment.Index=i; 
+                           this.NextAppointment.Index=i;
                         }
 
 
-                    }        
+                    };
+                }else{
+
+                  this.NextAppointment.Object={};
+                  this.NextAppointment.Index=-1;
+                  console.log(this.NextAppointment.Object);
                 }
-        /*  
+        /*
             * Setting User Calendar
             //The rest of this function takes the results from the sorted by date appointments and organizes them into an object with
-             //hierarchical structure year->month->day->appointments for the day, the dayly appointments are arrays.  
+             //hierarchical structure year->month->day->appointments for the day, the dayly appointments are arrays.
 
         */
         //Initializing local variables
@@ -187,7 +192,7 @@ myApp.service('Appointments', ['$q', 'RequestToServer','$cordovaCalendar','UserA
             var tmpDay = (this.UserAppointmentsArray[i].ScheduledStartTime).getDate();
 
             //if month has changed, since appointments in order, add the resulting appointments to for that month to the correspongding
-            //calendar year. 
+            //calendar year.
             if (month !== tmpMonth || (month === tmpMonth && year !== tmpYear)) {
                 if (i > 0) {
                     calendarYear[month] = {};
@@ -210,8 +215,8 @@ myApp.service('Appointments', ['$q', 'RequestToServer','$cordovaCalendar','UserA
             }
 
             //If statement just to defined objects and prevent exception in case certain day does not
-            //have any appointments yet. It then adds to the calendaMonth object for that day the 
-            //appointment 
+            //have any appointments yet. It then adds to the calendaMonth object for that day the
+            //appointment
             if (calendarMonth[tmpDay] === undefined) calendarMonth[tmpDay] = [];
             calendarMonth[tmpDay].push(this.UserAppointmentsArray[i]);
 
@@ -234,7 +239,7 @@ myApp.service('Appointments', ['$q', 'RequestToServer','$cordovaCalendar','UserA
         *@ngdoc method
         *@name getUserAppointment
         *@methodOf MUHCApp.services:UserAppointments
-        *@returns {Array} UserAppointmentArray 
+        *@returns {Array} UserAppointmentArray
         *@description Returns the Array of Appointments organized chronologically.
         **/
         getUserAppointments: function () {
@@ -245,7 +250,7 @@ myApp.service('Appointments', ['$q', 'RequestToServer','$cordovaCalendar','UserA
         *@ngdoc method
         *@name getTodaysAppointments
         *@methodOf MUHCApp.services:UserAppointments
-        *@returns {Array} TodayAppointments 
+        *@returns {Array} TodayAppointments
         *@description Returns an Array with appointments for the day.
         **/
         getTodaysAppointments: function () {
@@ -256,7 +261,7 @@ myApp.service('Appointments', ['$q', 'RequestToServer','$cordovaCalendar','UserA
         *@ngdoc method
         *@name getFutureAppointments
         *@methodOf MUHCApp.services:UserAppointments
-        *@returns {Array} FutureAppointments 
+        *@returns {Array} FutureAppointments
         *@description Returns array of future appointments.
         **/
         getFutureAppointments: function () {
@@ -266,7 +271,7 @@ myApp.service('Appointments', ['$q', 'RequestToServer','$cordovaCalendar','UserA
         *@ngdoc method
         *@name getPastAppointments
         *@methodOf MUHCApp.services:UserAppointments
-        *@returns {Array} PastAppointments 
+        *@returns {Array} PastAppointments
         *@description Returns array of past appointments.
         **/
         getPastAppointments: function () {
@@ -292,6 +297,14 @@ myApp.service('Appointments', ['$q', 'RequestToServer','$cordovaCalendar','UserA
         *@returns {Object} calendar
         *@description Returns the calendar object.
         **/
+        getLastAppointmentCompleted:function(){
+          if(this.UserAppointmentsArray.length==0) return -1;
+          return this.UserAppointmentsArray[this.UserAppointmentsArray.length-1];
+        },
+        getLastAppointmentCompletedIndex:function(){
+          if(this.UserAppointmentsArray.length==0) return -1;
+          return this.UserAppointmentsArray.length-1;
+        },
         getUserCalendar:function(){
             return this.calendar;
         },
@@ -342,12 +355,10 @@ myApp.service('Appointments', ['$q', 'RequestToServer','$cordovaCalendar','UserA
                         );
                 });
                 });
-                
+
 
             }
 
         }
     };
 }]);
-        
-   

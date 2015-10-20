@@ -15,7 +15,7 @@
 *@requires MUHCApp.services.UserPlanWorkflow
 *@element textarea
 *@description
-*Manages the logic of the home screen after log in, instatiates 
+*Manages the logic of the home screen after log in, instatiates
 */
 var myApp = angular.module('MUHCApp');
 myApp.controller('HomeController', ['$state','Appointments', '$scope','Patient','UpdateUI', '$timeout','$filter','$cordovaNetwork','UserPlanWorkflow','$rootScope', 'tmhDynamicLocale','$translate', '$translatePartialLoader', function ($state,Appointments, $scope, Patient,UpdateUI,$timeout,$filter,$cordovaNetwork,UserPlanWorkflow, $rootScope,tmhDynamicLocale, $translate, $translatePartialLoader) {
@@ -25,8 +25,8 @@ myApp.controller('HomeController', ['$state','Appointments', '$scope','Patient',
         * @methodOf MUHCApp.controller:HomeController
         * @callback MUHCApp.controller:HomeController.loadInfo
         * @description
-        * Pull to refresh functionality, calls {@link MUHCApp.service:UpdateUI} service through the callback to update all the fields, then using 
-        * the {@link MUHCApp.service:UpdateUI} callback it updates the scope of the HomeController. 
+        * Pull to refresh functionality, calls {@link MUHCApp.service:UpdateUI} service through the callback to update all the fields, then using
+        * the {@link MUHCApp.service:UpdateUI} callback it updates the scope of the HomeController.
         *
         *
         */
@@ -34,8 +34,8 @@ myApp.controller('HomeController', ['$state','Appointments', '$scope','Patient',
         $scope.dateToday=new Date();
         var date;
         var nextAppointment=Appointments.getNextAppointment();
-       
-        if(nextAppointment.hasOwnProperty('Object')){
+
+        if(nextAppointment.Index!=-1){
             $scope.noNextAppointment=false;
             $scope.NextAppointment=nextAppointment.Object;
             console.log($scope.NextAppointment);
@@ -64,7 +64,7 @@ myApp.controller('HomeController', ['$state','Appointments', '$scope','Patient',
     }
         homePageInit();
         $scope.load = function($done) {
-          
+
           $timeout(function() {
             loadInfo();
                 $done();
@@ -80,8 +80,8 @@ myApp.controller('HomeController', ['$state','Appointments', '$scope','Patient',
                 });
         });
        }
-//Sets all the variables in the view. 
-    
+//Sets all the variables in the view.
+
 }]);
 
 
@@ -90,6 +90,3 @@ myApp.controller('WelcomeHomeController',function($scope,Patient){
     $scope.LastName = Patient.getLastName();
     $scope.welcomeMessage="We are happy to please you with some quality service";
 });
-
-
-

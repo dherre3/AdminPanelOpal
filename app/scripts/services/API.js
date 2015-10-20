@@ -217,6 +217,7 @@ app.service('User',function(){
       return r.promise;
     },
     setMessages:function (messages){
+      console.log(messages);
         var userDoctor=$rootScope.currentUser.DoctorSerNum;
         var userAdmin=$rootScope.currentUser.AdminSerNum;
         var userSerNum;

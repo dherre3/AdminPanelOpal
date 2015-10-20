@@ -6,22 +6,25 @@ angular.module('MUHCApp')
             $scope.noFutureAppointments=false;
             $scope.today = new Date(temp.getFullYear(), temp.getMonth(), temp.getDate());
             var nextAppointment =Appointments.getNextAppointment().Object;
-            console.log(nextAppointment);
-            if(nextAppointment.ScheduledStartTime===undefined) $scope.errorFirebase = true;
-            $scope.nextAppointmentDate = nextAppointment.ScheduledStartTime;
-            if(nextAppointment.ScheduledStartTime<$scope.today){
-                $scope.noFutureAppointments=true;
-                $scope.lastAppointmentDate=Appointments.getUserAppointments()[(Appointments.getUserAppointments()).length-1].ScheduledStartTime;
+            if(Appointments.getLastAppointmentCompleted()==-1){
+              $scope.errorFirebase=true;
+            }else if(Appointments.getNextAppointment().Index==-1){
+              $scope.noFutureAppointments=true;
+              $scope.infoReady=true;
+              $scope.disableButton=true;
+              $scope.lastAppointmentDate=Appointments.getLastAppointmentCompleted().ScheduledStartTime;
+            }else{
+              $scope.nextAppointmentDate = nextAppointment.ScheduledStartTime;
+              $scope.date=new Date($scope.nextAppointmentDate.getFullYear(),$scope.nextAppointmentDate.getMonth(),$scope.nextAppointmentDate.getDate());
+              //Check if user is logged in, if he is tell him he is already logged in, else check if he can check in.
+              (nextAppointment.Checkin==1)?$scope.checkIn= true :$scope.checkIn=false;
+              if (nextAppointment.Checkin===1) {
+                  alreadyCheckedIn();
+              } else {
+                  checkToCheckIn();
+              }
             }
-            $scope.date=new Date($scope.nextAppointmentDate.getFullYear(),$scope.nextAppointmentDate.getMonth(),$scope.nextAppointmentDate.getDate());
 
-            //Check if user is logged in, if he is tell him he is already logged in, else check if he can check in.
-            (nextAppointment.Checkin==1)?$scope.checkIn=true:$scope.checkIn=false;
-            if (nextAppointment.Checkin===1 && $scope.today.getTime()=== $scope.date.getTime()) {
-                alreadyCheckedIn();
-            } else {
-                checkToCheckIn();
-            }
         };
 
         $scope.checkInButton = function () {
@@ -38,7 +41,7 @@ angular.module('MUHCApp')
             //var distanceMeters = 1000 * getDistanceFromLatLonInKm(position.coords.latitude, position.coords.longitude, 45.4745561, -73.5999842);
             //var distanceMeters=1000*getDistanceFromLatLonInKm(position.coords.latitude, position.coords.longitude,45.5072138,-73.5784825);
             var distanceMeters = 100;
-            /*alert('Distance: '+ distanceMeters+ 
+            /*alert('Distance: '+ distanceMeters+
                 'Latitude: '          + position.coords.latitude          + '\n' +
               'Longitude: '         + position.coords.longitude         + '\n' +
               'Altitude: '          + position.coords.altitude          + '\n' +
@@ -52,7 +55,7 @@ angular.module('MUHCApp')
                         $scope.checkInAllowed = true;
                         $scope.disableButton = false;
                         $scope.infoReady = true;
-                
+
                     });
             } else {
                 $timeout(function(){
@@ -89,7 +92,7 @@ angular.module('MUHCApp')
                 });
         }
 
-       
+
 
          // onError Callback receives a PositionError object
         //
@@ -97,7 +100,7 @@ angular.module('MUHCApp')
             alert('code: ' + error.code + '\n' +
                 'message: ' + error.message + '\n');
         }
-       
+
          function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
             var R = 6371; // Radius of the earth in km
             var dLat = deg2rad(lat2 - lat1); // deg2rad below
