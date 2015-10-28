@@ -24,7 +24,7 @@
  </div>
       <div class="container hidden-xs hidden-sm" align="center" >
 
-    
+
     <div align="left" style="text-align:left"><h3><strong>General Account Settings</strong></h3></div>
     <hr />
     <div style="text-align: left" class="col-xs-4 col-sm-4 col-lg-4">
@@ -202,17 +202,19 @@
       <div class="left"><ons-back-button>Back</ons-back-button></div>
       <div class="center">{{value}}</div>
     </ons-toolbar>
-  
+
     <div ng-show="personal">
     <div class="lucent" style="margin-left:2vw;margin-top:10vh">
           <p class="note">{{instruction}}</p>
     </div>
-     <ons-list modifier="noborder" class="settings-list" style="margin-top:5vh">
-        <ons-list-item >
-          <input ng-minlength="1" type="{{type1}}" class="text-input text-input--transparent width-full" placeholder="Enter new {{value}}" value="{{value}}" ng-model="newValue">
-          <a ng-click="newValue=''" ><span class="list-item-note lucent"><ons-icon icon="ion-close-circled"></ons-icon></span></a>
-        </ons-list-item>
-      </ons-list>
+          <ul class="list">
+            <li class="list__item">
+              <div class="row">
+                <input ng-minlength="1" type="{{type1}}" class="text-input text-input--transparent width-full" placeholder="Enter new {{value}}" value="{{value}}" ng-model="newValue">
+                <a ng-click="newValue=''" ><span class="list-item-note lucent"><i class="ion-close-circled"></i></span></a>
+              </div>
+            </li>
+          </ul>
       <div ng-show="value=='Password'||value=='Email'">
          <div class="lucent" style="margin-left:2vw;margin-top:2vh">
           <p class="note">{{instructionOld}}</p>
@@ -255,7 +257,7 @@
 </ul>
 </div>
 
-     
+
   </ons-page>
 </ons-template>
 </ons-navigator>

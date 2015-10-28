@@ -1,5 +1,5 @@
 var app=angular.module('adminPanelApp');
-app.controller('LoginModalController',function ($scope, $modalInstance,$rootScope,$http,User) {
+app.controller('LoginModalController',function ($scope, $modalInstance,$rootScope,$http,User, api, Messages, $timeout, AllPatients) {
 
     /**
   * @ngdoc controller
@@ -30,6 +30,8 @@ app.controller('LoginModalController',function ($scope, $modalInstance,$rootScop
      * @param {String} password password specified by the user.
      * @returns {Object} $rootScope.Admin
      */
+
+
       // Authentication for superuser
       if (username==="root" && $rootScope.user.users[username]===password)
         {
@@ -47,8 +49,30 @@ app.controller('LoginModalController',function ($scope, $modalInstance,$rootScop
           {
             $rootScope.alerts["LoginAlert"]={};
             User.setUserFields(response);
+            User.getNumberOfPatientsForUserFromServer().then(function(data){
+              $rootScope.loggedin=true;
+              $rootScope.TotalNumberOfPatients=data.data[0].TotalNumberOfPatients;
+              User.setNumberOfDoctorPatients(data.data[1].TotalNumberOfDoctorPatients);
+              $rootScope.TotalNumberOfDoctorPatients=User.getNumberOfDoctorPatients();
+              api.getAllPatients().then(function(result){
+                AllPatients.setPatients(result);
+                Messages.getMessagesFromServer().then(function(messagesFromService){
+                Messages.setMessages(messagesFromService);
+              });
+            });
+
+            });
+
             $modalInstance.close(response);
-            $rootScope.Admin=response;
+            if(User.getUserFields().UserRole=='Admin'){
+              $rootScope.admin=true;
+            }else {
+              $timeout(function(){
+                $rootScope.admin=false;
+              })
+
+            }
+
           }
           else if (response == "InvalidCredentials")
           {

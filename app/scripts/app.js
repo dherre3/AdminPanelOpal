@@ -26,9 +26,17 @@ app.config(['$urlRouterProvider', '$stateProvider', function ($urlRouterProvider
     .state('home',{
       url:'/',
       templateUrl: 'views/main.html',
-      controller: 'MainCtrl',
+      controller: 'MainController',
       data:
       {
+        requireLogin:true
+      }
+    })
+    .state('registration',{
+      url:'/registration',
+      templateUrl:'views/registration.html',
+      controller:'RegistrationController',
+      data:{
         requireLogin:true
       }
     })
@@ -160,7 +168,13 @@ app.service('LoginModal', function ($rootScope,$uibModal)
           size: 'md'
         });
         return modalInstance.result.then(function (user){
-          $rootScope.currentUser=user ;
+          console.log(user);
+          $rootScope.currentUser=user;
+          var userLocalStorage=window.localStorage.getItem('OpalPanelUser');
+          if(!userLocalStorage){
+            window.localStorage.setItem('OpalPanelUser',JSON.stringify(user));
+          }
+
 
         });
       };
@@ -169,7 +183,11 @@ app.service('LoginModal', function ($rootScope,$uibModal)
 // RUN
 app.run(function ($rootScope, $state,LoginModal,$timeout)
 {
-  $rootScope.activeClasses=['active','','','','']
+  $rootScope.activeClasses={};
+  $rootScope.activeClasses['home']='active';
+  $rootScope.activeClassesPatientMenu={};
+  $rootScope.activeClassesPatientMenu['patient.patients.general']='active';
+
   /**
   * @ngdoc service
   * @name AdminPanel.service:run
@@ -183,10 +201,30 @@ app.run(function ($rootScope, $state,LoginModal,$timeout)
   $rootScope.$on('$stateChangeStart', function (event, toState, toParams)
   {
     var requireLogin = toState.data.requireLogin;
+    console.log(toState.name);
     setMenuClasses(toState.name);
+    function makeOtherTabsInactive(menu, tabToActive){
+      for (var tab in menu) {
+        if(tab!==tabToActive)
+        {
+          menu[tab]='';
+        }
+      }
+    }
     function setMenuClasses(tab){
       $timeout(function(){
         console.log(tab);
+        var other=tab;
+        console.log(other.split('.').length);
+        if(other.split('.').length==3){
+          $rootScope.activeClassesPatientMenu[tab]='active';
+          makeOtherTabsInactive($rootScope.activeClassesPatientMenu,tab);
+        }else{
+          $rootScope.activeClasses[tab]='active';
+          makeOtherTabsInactive($rootScope.activeClasses,tab);
+        }
+
+        /*
          if(tab=='home'){
             $rootScope.activeClasses=['active','','','',''];
           }else if(tab=='messages'){
@@ -215,9 +253,10 @@ app.run(function ($rootScope, $state,LoginModal,$timeout)
           }
           else if(tab=='patients.patient.requests'){
             $rootScope.activeClassesPatientMenu=['','','','','','','active'];
+          else if(tab=='patients.patient.')
           }else{
             $rootScope.activeClasses=['','active','','',''];
-          }
+          }*/
       });
 
 
@@ -227,7 +266,7 @@ app.run(function ($rootScope, $state,LoginModal,$timeout)
       event.preventDefault();
       LoginModal()
       .then(function () {
-          setMenuClasses(toState.name);
+        setMenuClasses(toState.name);
         return $state.go(toState.name, toParams);
       })
       .catch(function ()
@@ -242,23 +281,3 @@ app.run(function ($rootScope, $state,LoginModal,$timeout)
 
 
 });
-
-
-
-
-  /*.config(function ($routeProvider) {
-    $routeProvider
-      .when('/', {
-        templateUrl: 'views/main.html',
-        controller: 'MainCtrl',
-        controllerAs: 'main'
-      })
-      .when('/about', {
-        templateUrl: 'views/about.html',
-        controller: 'AboutCtrl',
-        controllerAs: 'about'
-      })
-      .otherwise({
-        redirectTo: '/'
-      });
-  });*/

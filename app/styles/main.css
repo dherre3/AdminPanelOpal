@@ -10,9 +10,8 @@ body {
 /* Responsive: Portrait tablets and up */
 @media screen and (min-width: 768px) {
   .container {
-    max-width: 730px;
+    max-width: 850px;
   }
-
   /* Remove the padding we set earlier */
   .header,
   .marketing,
@@ -50,7 +49,7 @@ body {
 *Container div views
 */
 .main-div-container{
-
+  box-shadow: 0 0 20px lightgrey;
   margin:0 auto;
   margin-top:-10px;
   min-height:65vh;
@@ -64,7 +63,7 @@ body {
   background-color: #fbfbfb;
   border-radius: 4px;
   width:100%;
-  height:490px;
+  min-height:490px;
 }
 
 
@@ -344,4 +343,58 @@ body {
 }
 .conversationSelected{
   background-color: lightgrey;
+}
+/*
+*Account Page
+*/
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+}
+/*
+*Registration Page
+*
+*/
+
+#mainContainer {
+  vertical-align: middle;
+  text-align: center;
+  margin:0 auto;
+}
+input.container {
+  width :25%;
+  clear: both;
+  text-align: center;
+}
+.has-error {
+  text-align: center;
+}
+input.has-error {
+  text-align : center;
+}
+/*
+*Patient Documents
+*/
+.div-document{
+  padding:10px;
+    border:1px solid rgba(0, 0, 0, 0.1);
+    border-radius:4px;
+    background-color:white;
+    color:black;
+    margin:2px 2px 2px 2px;
 }

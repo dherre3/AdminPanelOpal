@@ -18,7 +18,7 @@
 *Manages the logic of the home screen after log in, instatiates
 */
 var myApp = angular.module('MUHCApp');
-myApp.controller('HomeController', ['$state','Appointments', '$scope','Patient','UpdateUI', '$timeout','$filter','$cordovaNetwork','UserPlanWorkflow','$rootScope', 'tmhDynamicLocale','$translate', '$translatePartialLoader', function ($state,Appointments, $scope, Patient,UpdateUI,$timeout,$filter,$cordovaNetwork,UserPlanWorkflow, $rootScope,tmhDynamicLocale, $translate, $translatePartialLoader) {
+myApp.controller('HomeController', ['$state','Appointments', '$scope','Patient','UpdateUI', '$timeout','$filter','$cordovaNetwork','UserPlanWorkflow','$rootScope', 'tmhDynamicLocale','$translate', '$translatePartialLoader', 'RequestToServer', function ($state,Appointments, $scope, Patient,UpdateUI,$timeout,$filter,$cordovaNetwork,UserPlanWorkflow, $rootScope,tmhDynamicLocale, $translate, $translatePartialLoader, RequestToServer) {
        /**
         * @ngdoc method
         * @name load
@@ -75,6 +75,7 @@ myApp.controller('HomeController', ['$state','Appointments', '$scope','Patient',
         };
 
         function loadInfo(){
+          RequestToServer.sendRequest('Refresh');
            var dataVal= UpdateUI.UpdateUserFields();
            dataVal.then(function(data){
                 $timeout(function(){

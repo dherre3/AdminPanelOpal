@@ -2,45 +2,13 @@ var app=angular.module('adminPanelApp');
 
 app.service('api',function ($rootScope, $http,$q) {
   return{
-  	getAllFields:function(patientTable, fieldSearchType, value){
-      var patientURL="http://localhost:8888/qplus/AdminPanel-MySQLDB-NodeListener-Docs/php/MySQLFind.php?";
-      var doctorURL="http://localhost:8888/qplus/AdminPanel-MySQLDB-NodeListener-Docs/php/GetDoctors.php?";
-      var activityURL="http://localhost:8888/qplus/AdminPanel-MySQLDB-NodeListener-Docs/php/GetActivities.php?";
-      var appointmentURL="http://localhost:8888/qplus/AdminPanel-MySQLDB-NodeListener-Docs/php/GetAppointments.php?";
-      var searchQuery='';
-      if (fieldSearchType=='lastname')
-      {
-        patientURL=patientURL+"LastName='"+value +"'&";
-        doctorURL=doctorURL+"LastName='"+value+"'&";
-        activityURL=activityURL+"LastName='"+value+"'&";
-        appointmentURL=appointmentURL+"LastName='"+value +"'&";
-      }else if(fieldSearchType=='patientId'){
-        patientURL=patientURL+"PatientId='"+value+"'&";
-        doctorURL=doctorURL+"PatientId='"+value+"'&";
-        activityURL=activityURL+"PatientId='"+value +"'&";
-        appointmentURL=appointmentURL+"PatientId='"+value+"'&";
-      }
-      if(patientTable=='patient'){
-        searchQuery=patientURL;
-      }else if(patientTable=='doctor'){
-        searchQuery=doctorURL;
-      }else if(patientTable=='activity'){
-        searchQuery=activityURL;
-      }else if(patientTable=='appointments'){
-         searchQuery=appointmentURL;
-      }
 
-      $http.get(searchQuery).success( function (response){
-        if(typeof response[0].LastName!== 'undefined'){
-          return response[0];
-        }else if(response='PatientNotFound'){
-          return {message:'Patient Not Found!',
-            type:'danger'};
-
-        }
-      });
-    },
     getAllPatients:function(){
+//First Name, Last Name, patient Id, ram q on patient id card.
+//Patients per schedule date.
+//Patients today, then Currently being treated.
+//
+
 
     	var r=$q.defer();
     	var userDoctor=$rootScope.currentUser.DoctorSerNum;
@@ -69,9 +37,29 @@ app.service('api',function ($rootScope, $http,$q) {
       });
       return r.promise;
     }
+  ,getFieldFromServer:function (url, objectToSend){
+    var r=$q.defer();
+    var req = {
+     method: 'POST',
+     url: url,
+     headers: {
+       'Content-Type': undefined
+     },
+     data: objectToSend
+    }
+
+    $http(req).then(function(data){
+        r.resolve(data);
+
+    }, function(error){
+      r.reject(error);
+
+    });
+    return r.promise;
   }
+}
 });
-app.service('AllPatients',function(api,$q){
+app.service('AllPatients',function(api,$q,URLs){
   return{
     setPatients:function(patients)
     {
@@ -103,19 +91,31 @@ app.service('AllPatients',function(api,$q){
 
 });
 
-  app.service('Patient',function(){
-    return{
-      setPatient:function(patient){
-        this.Patient=patient;
-      },
-      getPatient:function(){
-        return this.Patient;
-      }
 
-    };
-  });
-app.service('User',function(){
+app.service('User',function(URLs, $q,api,$http){
   return{
+    getNumberOfPatientsForUserFromServer:function(){
+      var r=$q.defer();
+
+      if(this.UserRole=='Doctor')
+      {
+        console.log(this.UserRole);
+        var DoctorSerNum=this.UserSerNum;
+        r.resolve( api.getFieldFromServer(URLs.getCountOfPatientsUrl(), {'DoctorSerNum':DoctorSerNum}));
+      }else{
+        r.resolve(api.getFieldFromServer(URLs.getCountOfPatientsUrl(), {'AdminSerNum':this.UserSerNum}));
+      }
+      return r.promise;
+
+    },
+    setNumberOfDoctorPatients:function(data)
+    {
+      this.NumberOfDoctorPatients=data;
+    },
+    getNumberOfDoctorPatients:function()
+    {
+      return this.NumberOfDoctorPatients;
+    },
     setUserRole:function(role){
       this.UserRole=role;
     },
@@ -148,8 +148,11 @@ app.service('User',function(){
       this.FirstName=fields.FirstName;
       this.LastName=fields.LastName;
       this.Email=fields.Email;
-
+      this.Password=fields.Password;
+      this.Username=fields.Username;
+      var serNum;
       if(fields.DoctorSerNum){
+        serNum=fields.DoctorSerNum;
         this.UserSerNum=fields.DoctorSerNum;
         this.DoctorAriaSer=fields.DoctorAriaSer;
         this.UserRole='Doctor';
@@ -157,6 +160,7 @@ app.service('User',function(){
         this.UserFields.UserSerNum=fields.DoctorSerNum;
         this.Image=fields.Image;
       }else{
+        serNum=fields.AdminSerNum;
         this.UserSerNum=fields.AdminSerNum;
         this.UserFields.UserSerNum=fields.AdminSerNum;
         this.UserRole='Admin';
@@ -165,24 +169,101 @@ app.service('User',function(){
       }
       this.Phone=fields.Phone;
       this.UserFields={
+        UserSerNum:serNum,
+        Password:fields.Password,
         FirstName:fields.FirstName,
         LastName:fields.LastName,
         Email:fields.Email,
         DoctorAriaSer:fields.DoctorAriaSer,
         Image:fields.Image,
         Phone:fields.Phone,
+        Username:fields.Username
       };
+      var arrayKeys=Object.keys(this.UserFields);
+      this.AccountObject={};
+      for (var i = 0; i < arrayKeys.length; i++) {
+        if(arrayKeys[i]!='UserSerNum'&&arrayKeys[i]!='Password'&&arrayKeys[i]!='DoctorAriaSer'){
+          console.log(arrayKeys[i]);
+          if(arrayKeys[i]!='Image'){
+            this.AccountObject[arrayKeys[i]]=
+            {
+              'Value':this.UserFields[arrayKeys[i]],
+              'Edit':false,
+              'newValue':this.UserFields[arrayKeys[i]]
+            }
+          }else{
+            this.AccountObject[arrayKeys[i]]=
+            {
+              'Value':URLs.getBasicUrl()+this.UserFields[arrayKeys[i]],
+              'Edit':false,
+              'newValue':this.UserFields[arrayKeys[i]]
+            }
+          }
+
+        }else if(arrayKeys[i]=='Password')
+        {
+          this.AccountPassword=
+          {
+            'Value':this.UserFields[arrayKeys[i]],
+            'Edit':false,
+            'newValue':''
+          }
+        }
+
+      }
+
+    },
+    getAccountFields:function(){
+      return this.AccountObject;
+    },
+    getUsername:function(){
+      return this.Username;
     },
     getUserFields:function()
     {
       return this.UserFields;
+    },
+    getUserPassword:function(){
+      return this.AccountPassword;
+    },
+    updateFieldInServer:function(field,newValue)
+    {
+      var r=$q.defer();
+      objectToSend={};
+      objectToSend.field=field;
+      objectToSend.newValue=newValue;
+      if(this.UserRole=='Doctor'){
+        objectToSend.DoctorSerNum=this.UserSerNum;
+      }else{
+        objectToSend.AdminSerNum=this.UserSerNum;
+      }
+      var url=URLs.getUpdateFieldUrl();
+      var req = {
+       method: 'POST',
+       url: url,
+       headers: {
+         'Content-Type': undefined
+       },
+       data: objectToSend
+      }
+      $http(req).then(function(data){
+        console.log(data.data);
+          r.resolve(data);
+
+      }, function(error){
+        r.reject(error);
+
+      });
+      return r.promise;
+
+
     }
   };
 });
  app.service('Messages',function($http, $q, $rootScope,$filter,AllPatients, User,URLs){
    function findPatientConversationIndexBySerNum(array,serNum){
       for (var i = 0; i < array.length; i++) {
-        if(array.PatientSerNum==serNum){
+        if(array[i].PatientSerNum==serNum){
           return i;
         }
       }
@@ -216,6 +297,13 @@ app.service('User',function(){
 	      });
       return r.promise;
     },
+    findPatientConversationIndexBySerNum:  function (serNum){
+       for (var i = 0; i < this.UserConversationsArray.length; i++) {
+         if(this.UserConversationsArray[i].PatientSerNum==serNum){
+           return i;
+         }
+       }
+     },
     setMessages:function (messages){
       console.log(messages);
         var userDoctor=$rootScope.currentUser.DoctorSerNum;
@@ -256,52 +344,59 @@ app.service('User',function(){
             conversation.AriaSer=patients[i].PatientAriaSer;
             this.ConversationsObject[key]=conversation;
         };
+        console.log(this.ConversationsObject);
+        console.log(messages);
+        if(messages!=='No Messages Found'){
+          for (var i = 0; i < keysArray.length; i++) {
+              var Message={};
+              var message=messages[keysArray[i]];
+              if(messages[i].ReceiverRole==userRole&&messages[i].ReceiverSerNum==userSerNum)
+              {
+                partnerSerNum=message.SenderSerNum;
+                key=message.SenderRole+':'+message.SenderSerNum;
+                Message.Role=0;
+                Message.MessageContent=message.MessageContent;
+                Message.Date=new Date(message.MessageDate);
+                Message.ReadStatus=parseInt(message.ReceiverReadStatus);
+                Message.MessageSerNum=message.MessageSerNum;
+                this.ConversationsObject[key].EmptyConversation=false;
+                this.ConversationsObject[key].Messages.push(Message);
 
-        for (var i = 0; i < keysArray.length; i++) {
-            var Message={};
-            var message=messages[keysArray[i]];
-            if(messages[i].ReceiverRole==userRole&&messages[i].ReceiverSerNum==userSerNum)
-            {
-              partnerSerNum=message.SenderSerNum;
-              key=message.SenderRole+':'+message.SenderSerNum;
-              console.log(key);
-              Message.Role=0;
-              Message.MessageContent=message.MessageContent;
-              Message.Date=new Date(message.MessageDate);
-              Message.ReadStatus=parseInt(message.ReceiverReadStatus);
-              Message.MessageSerNum=message.MessageSerNum;
-              this.ConversationsObject[key].EmptyConversation=false;
-              this.ConversationsObject[key].Messages.push(Message);
+              }else{
+                partnerSerNum=message.ReceiverSerNum;
+                key=message.ReceiverRole+':'+message.ReceiverSerNum;
+                Message.Role=1;
+                Message.MessageContent=message.MessageContent;
+                Message.Date=new Date(message.MessageDate);
+                Message.ReadStatus=1;
+                Message.MessageSerNum=message.MessageSerNum;
+                this.ConversationsObject[key].EmptyConversation=false;
+                this.ConversationsObject[key].Messages.push(Message);
+              }
+          }
+          var keysArrayConvo = Object.keys(this.ConversationsObject);
+          for (var i = 0; i < keysArrayConvo.length; i++) {
+              this.ConversationsObject[keysArrayConvo[i]].Messages=$filter('orderBy')(this.ConversationsObject[keysArrayConvo[i]].Messages,'Date',false);
 
-            }else{
-              partnerSerNum=message.ReceiverSerNum;
-              key=message.ReceiverRole+':'+message.ReceiverSerNum;
-              console.log(key);
-              Message.Role=1;
-              Message.MessageContent=message.MessageContent;
-              Message.Date=new Date(message.MessageDate);
-              Message.ReadStatus=1;
-              Message.MessageSerNum=message.MessageSerNum;
-              this.ConversationsObject[key].EmptyConversation=false;
-              this.ConversationsObject[key].Messages.push(Message);
-            }
+              if(this.ConversationsObject[keysArrayConvo[i]].Messages[this.ConversationsObject[keysArrayConvo[i]].Messages.length-1]!==undefined){
+                  this.ConversationsObject[keysArrayConvo[i]].DateOfLastMessage=this.ConversationsObject[keysArrayConvo[i]].Messages[this.ConversationsObject[keysArrayConvo[i]].Messages.length-1].Date;
+                  this.ConversationsObject[keysArrayConvo[i]].ReadStatus=this.ConversationsObject[keysArrayConvo[i]].Messages[this.ConversationsObject[keysArrayConvo[i]].Messages.length-1].ReadStatus;
+                  if(this.ConversationsObject[keysArrayConvo[i]].ReadStatus===0){
+                      $rootScope.NumberOfNewMessages+=1;
+                  }
+              }
+              this.UserConversationsArray.push(this.ConversationsObject[keysArrayConvo[i]]);
+
+
+          };
+          console.log(this.UserConversationsArray);
+        }else{
+          var objectKeys=Object.keys(this.ConversationsObject);
+          for (var i = 0; i < objectKeys.length; i++) {
+            this.UserConversationsArray.push(this.ConversationsObject[objectKeys[i]]);
+          }
         }
-        var keysArrayConvo = Object.keys(this.ConversationsObject);
-        for (var i = 0; i < keysArrayConvo.length; i++) {
-            this.ConversationsObject[keysArrayConvo[i]].Messages=$filter('orderBy')(this.ConversationsObject[keysArrayConvo[i]].Messages,'Date',false);
 
-            if(this.ConversationsObject[keysArrayConvo[i]].Messages[this.ConversationsObject[keysArrayConvo[i]].Messages.length-1]!==undefined){
-                this.ConversationsObject[keysArrayConvo[i]].DateOfLastMessage=this.ConversationsObject[keysArrayConvo[i]].Messages[this.ConversationsObject[keysArrayConvo[i]].Messages.length-1].Date;
-                this.ConversationsObject[keysArrayConvo[i]].ReadStatus=this.ConversationsObject[keysArrayConvo[i]].Messages[this.ConversationsObject[keysArrayConvo[i]].Messages.length-1].ReadStatus;
-                if(this.ConversationsObject[keysArrayConvo[i]].ReadStatus===0){
-                    $rootScope.NumberOfNewMessages+=1;
-                }
-            }
-            this.UserConversationsArray.push(this.ConversationsObject[keysArrayConvo[i]]);
-
-
-        };
-        console.log(this.UserConversationsArray);
 
         return this.UserConversationsArray;
 
@@ -325,6 +420,7 @@ app.service('User',function(){
       objectMessage.Date=dateOfmessage;
       objectMessage.MessageContent=content;
       objectMessage.ReadStatus=1;
+
       var indexConvo=findPatientConversationIndexBySerNum(this.UserConversationsArray , patientSerNum);
       this.UserConversationsArray[indexConvo].Messages.push(objectMessage);
       var req = {
@@ -336,24 +432,209 @@ app.service('User',function(){
        data: objectToSend
       }
 
-      //$http(req).then(function(){...}, function(){...});
+      $http(req).then(function(data){
+        if(data=='MessageSent'){
+          console.log(data);
+        }
+
+      }, function(error){
+        console.log(error);
+      });
     }
 
 };
 
 
  });
- app.service('URLs',function(){
-   var basicURL='http://localhost:8888/qplus/AdminPanel-MySQLDB-NodeListener-Docs/php/';
+ app.service('Patient',function(URLs,$http,$q, AllPatients,Messages,$filter,api){
+   function getPatientFieldFromServer(url, objectToSend){
+     var r=$q.defer();
+     var req = {
+      method: 'POST',
+      url: url,
+      headers: {
+        'Content-Type': undefined
+      },
+      data: objectToSend
+     }
+
+     $http(req).then(function(data){
+         r.resolve(data);
+
+     }, function(error){
+       r.reject(error);
+
+     });
+     return r.promise;
+   };
+
    return{
+     setPatient:function(patient){
+       this.Patient=patient;
+     },
+     getPatient:function(){
+       return this.Patient;
+     },
+     setPatientMessages:function(patientConversation){
+       console.log(patientConversation);
+       this.PatientConversation=patientConversation;
+     },
+     getPatientMessagesFromServer:function(){
+       var r=$q.defer();
+
+       api.getAllPatients().then(function(result){
+ 				AllPatients.setPatients(result);
+ 			r.resolve(	Messages.getMessagesFromServer().then(function(messagesFromService){
+ 				Messages.setMessages(messagesFromService);
+      }));
+    });
+    return r.promise;
+     },
+     getPatientMessages:function(){
+       return this.PatientConversation;
+     },
+     getPatientAppointmentsFromServer:function(){
+       var r =$q.defer();
+       r.resolve(getPatientFieldFromServer(URLs.getPatientAppointmentsUrl(), {PatientSerNum:this.Patient.PatientSerNum}));
+       return r.promise;
+     },
+     getPatientAppointments:function(){
+       return this.PatientAppointments;
+     },
+     setPatientAppointments:function(appointments){
+       this.PatientAppointments=[];
+       if(appointments!=""){
+       for (var i = 0; i < appointments.length; i++) {
+         appointments[i].ScheduledStartTime=new Date(appointments[i].ScheduledStartTime);
+         appointments[i].ScheduledEndTime=new Date(appointments[i].ScheduledEndTime);
+       };
+      appointments= $filter('orderBy')(appointments,'ScheduledStartTime',true);
+      if(appointments[0].ScheduledStartTime>new Date())
+      {
+        this.nextAppointment=appointments[0];
+      }else{
+        this.nextAppointment=-1;
+        this.lastAppointment=appointments[0];
+      }
+      this.PatientAppointments=appointments;
+     }
+
+     },
+     getPatientDoctorsFromServer:function(){
+       var r =$q.defer();
+       r.resolve(getPatientFieldFromServer(URLs.getPatientDoctorsUrl(), {PatientSerNum:this.Patient.PatientSerNum}));
+       return r.promise;
+     },
+     setPatientDoctors:function(doctors){
+       this.Doctors=[];
+       this.Oncologists=[];
+       this.Primary=[];
+       this.OtherDoctors=[]
+       for (var i = 0; i < doctors.length; i++) {
+         if(doctors[i].OncologistFlag=="1"){
+           this.Oncologists.push(doctors[i]);
+         }
+         if(doctors[i].PrimaryFlag=="1"){
+           this.Primary.push(doctors[i]);
+         }
+         if(doctors[i].PrimaryFlag=="0"&&doctors[i].OncologistFlag=="0"){
+           this.OtherDoctors.push(doctors[i]);
+         }
+
+       }
+     },
+     getPatientTreatmentPlanFromServer:function()
+     {
+
+     },
+     setPatientTreatmentPlan:function(){
+
+     },
+     getTreatmentPlan:function(){
+
+     },
+     getPatientDiagnosisFromServer:function(){
+       var r =$q.defer();
+       r.resolve(getPatientFieldFromServer(URLs.getPatientDiagnosisUrl(), {PatientSerNum:this.Patient.PatientSerNum}));
+       return r.promise;
+     },
+     setDiagnosis:function(diagnosis)
+     {
+       for (var i = 0; i < diagnosis.length; i++) {
+         diagnosis[i].CreationDate=new Date(diagnosis[i].CreationDate);
+
+       }
+       diagnosis=$filter('orderBy')(diagnosis, 'CreationDate', true);
+       this.PatientDiagnosis=diagnosis;
+     },
+     getDiagnosis:function()
+     {
+       return this.PatientDiagnosis;
+     },
+     getNextAppointment:function(){
+       return this.nextAppointment;
+     },
+     getLastAppointment:function(){
+       return this.lastAppointment;
+     },
+     getDocumentsFromServer:function()
+     {
+       var r =$q.defer();
+       r.resolve(api.getFieldFromServer(URLs.getDocumentsUrl(), {PatientSerNum:this.Patient.PatientSerNum}));
+       return r.promise;
+     },
+     setDocuments:function(documents)
+     {
+       for (var i = 0; i < documents.length; i++) {
+         documents[i].DateAdded=new Date(documents[i].DateAdded);
+       }
+       this.Documents=documents;
+
+     },
+     getDocuments:function(){
+       return this.Documents;
+     }
+
+   };
+ });
+
+ app.service('URLs',function(){
+   var basicURL='http://localhost:8888/qplus/AdminPanel-MySQLDB-NodeListener-Docs/';
+   var basicURLPHP=basicURL+'php/'
+
+   return{
+     getBasicURLPHP:function(){
+       return basicURLPHP;
+     },
      getBasicUrl:function(){
        return basicURL;
      },
      getSendMessageUrl:function(){
-       return basicURL+'sendMessage.php';
+       return basicURLPHP+'SendMessage.php';
      },
      getMessagesUrl:function(){
-       return basicURL+'GetMessages.php';
+       return basicURLPHP+'GetMessages.php';
+     },
+     getPatientMessagesUrl:function(){
+       return basicURLPHP+'GetPatientMessages.php';
+     },
+     getPatientDoctorsUrl:function(){
+       return basicURLPHP+'GetDoctors.php';
+     },
+     getPatientAppointmentsUrl:function(){
+       return basicURLPHP+'GetAppointments.php';
+     },
+     getPatientDiagnosisUrl:function(){
+       return basicURLPHP+'GetPatientDiagnosis.php';
+     },
+     getCountOfPatientsUrl:function(){
+       return basicURLPHP+'CountPatients.php';
+     },
+     getUpdateFieldUrl:function(){
+       return basicURLPHP+'updateField.php';
+     },
+     getDocumentsUrl:function(){
+       return basicURLPHP+'ObtainUserDocuments.php';
      }
    };
 

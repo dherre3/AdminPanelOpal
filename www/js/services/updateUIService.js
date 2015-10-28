@@ -55,20 +55,20 @@ myApp.service('UpdateUI', ['EncryptionService','$http', 'Patient','Doctors','App
                 function setUpServicesLocalStorage(){
                     updateAllServices(firebaseData,'Online');
                     var imageKeys=Object.keys(firebaseData.Images);
-                    window.localStorage.setItem(UserAuthorizationInfo.UserName, JSON.stringify(firebaseData)); 
+                    window.localStorage.setItem(UserAuthorizationInfo.UserName, JSON.stringify(firebaseData));
                 }
-                
+
                 decryptPromise().then( setUpServicesLocalStorage());
                 r.resolve(true);
             }
-            
+
         },function(error){
 
             r.reject(error);
-            
+
             });
 
-    
+
     }
     return r.promise;
     }
@@ -86,7 +86,7 @@ myApp.service('UpdateUI', ['EncryptionService','$http', 'Patient','Doctors','App
         UpdateUserFields:function(){
             //Check if its a device or a computer
             var r=$q.defer();
-            var app = document.URL.indexOf( 'http://' ) === -1 && document.URL.indexOf( 'https://' ) === -1; 
+            var app = document.URL.indexOf( 'http://' ) === -1 && document.URL.indexOf( 'https://' ) === -1;
             if(app){
                 if($cordovaNetwork.isOnline()){
                     return updateUIOnline();
@@ -99,11 +99,11 @@ myApp.service('UpdateUI', ['EncryptionService','$http', 'Patient','Doctors','App
                     console.log('online website');
                     return updateUIOnline();
                 }else{
-                    console.log('offline website'); 
+                    console.log('offline website');
                     return updateUIOffline();
                 }
-            }  
+            }
     }
     };
-        
+
 }]);
