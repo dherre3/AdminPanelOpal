@@ -1,13 +1,13 @@
 app.controller('AccountController',function ($rootScope, $scope,User, $timeout, fieldsValidate) {
 
-
+  User.getUserFromServer().then(function(response)
+  {
+    User.setUserSerNum(response.data);
+  });
 
   $scope.accountFields=User.getAccountFields();
   $scope.password=User.getUserPassword();
   $scope.username=User.AccountObject['Username'];
-  console.log($scope.username);
-
-
   var fields=User.getUserFields();
   if(fields.DoctorAriaSer){
     $scope.doctorAriaSer=fields.DoctorAriaSer;
@@ -15,6 +15,7 @@ app.controller('AccountController',function ($rootScope, $scope,User, $timeout, 
 
   $scope.update=function(key, value)
   {
+    console.log(value);
     var result=fieldsValidate.validateString(key,value);
     $timeout(function(){
       $scope.alert={};
@@ -24,12 +25,9 @@ app.controller('AccountController',function ($rootScope, $scope,User, $timeout, 
     if(result.type=='success')
     {
       User.updateFieldInServer(key, value);
+      User.updateUserField(key,value);
+      $scope.closeAllOtherFields();
     }
-
-
-    console.log(result);
-
-
   };
   $scope.updatePassword=function(){
     var result=fieldsValidate.validateString('Password',  $scope.password.newValue,  $scope.password.renewValue);
@@ -41,6 +39,8 @@ app.controller('AccountController',function ($rootScope, $scope,User, $timeout, 
     if(result.type=='success')
     {
       User.updateFieldInServer('Password', $scope.password.newValue);
+      User.updateUserField('Password',$scope.password.newValue);
+      $scope.closeAllOtherFields()
     }
 
     console.log(result);
@@ -58,6 +58,8 @@ app.controller('AccountController',function ($rootScope, $scope,User, $timeout, 
       if(result.type=='success')
       {
         User.updateFieldInServer('Username', $scope.username.newValue);
+        User.updateUserField('Username',$scope.username.newValue);
+        $scope.closeAllOtherFields();
       }
   }
   $scope.closeAllOtherFields=function(fieldName)

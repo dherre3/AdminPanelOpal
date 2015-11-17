@@ -48,7 +48,7 @@
                     Browse <input type="file" accept="image/*" fileread="uploadProfilePic">
                 </span>
 
-                <button ng-disabled="uploadProfilePic==undefined" class="btn btm-sm btn-success" ng-click="update(key, value.newValue)"> Update</button>&nbsp;
+                <button ng-disabled="uploadProfilePic==undefined" class="btn btm-sm btn-success" ng-click="update(key,uploadProfilePic)"> Update</button>&nbsp;
                 <button class="btn btm-sm btn-danger" ng-click="value.Edit=false;value.newValue=value.Value;uploadProfilePic=undefined"> Cancel</button>
                 <br><img width="100px" ng-src="{{uploadProfilePic}}" ng-show="uploadProfilePic">
               </div>

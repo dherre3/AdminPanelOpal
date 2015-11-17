@@ -21,7 +21,6 @@ app.service('api',function ($rootScope, $http,$q) {
        	console.log(patientsURL);
        }
       $http.get(patientsURL).success( function (response){
-
         if(typeof response[0].LastName!== 'undefined'){
    			console.log(response);
           r.resolve(response);
@@ -92,7 +91,7 @@ app.service('AllPatients',function(api,$q,URLs){
 });
 
 
-app.service('User',function(URLs, $q,api,$http){
+app.service('User',function(URLs, $q,api,$http,$rootScope){
   return{
     getNumberOfPatientsForUserFromServer:function(){
       var r=$q.defer();
@@ -100,13 +99,18 @@ app.service('User',function(URLs, $q,api,$http){
       if(this.UserRole=='Doctor')
       {
         console.log(this.UserRole);
-        var DoctorSerNum=this.UserSerNum;
+        var DoctorSerNum=this.UserTypeSerNum;
         r.resolve( api.getFieldFromServer(URLs.getCountOfPatientsUrl(), {'DoctorSerNum':DoctorSerNum}));
       }else{
-        r.resolve(api.getFieldFromServer(URLs.getCountOfPatientsUrl(), {'AdminSerNum':this.UserSerNum}));
+        r.resolve(api.getFieldFromServer(URLs.getCountOfPatientsUrl(), {'AdminSerNum':this.UserTypeSerNum}));
       }
       return r.promise;
 
+    },
+    setCredentials:function(username,password)
+    {
+      this.Password=password;
+      this.Username=username;
     },
     setNumberOfDoctorPatients:function(data)
     {
@@ -122,67 +126,123 @@ app.service('User',function(URLs, $q,api,$http){
     getUserRole:function(){
       return this.UserRole;
     },
-    setUserSerNum:function(serNum){
-      this.UserSerNum=serNum;
+    setUserTypeSerNum:function(serNum){
+      this.UserTypeSerNum=serNum;
     },
-    getUserSerNum:function()
+    getUserTypeSerNum:function()
     {
-      return this.UserSerNum;
+      return this.UserTypeSerNum;
+    },
+    setUserEmail:function(email)
+    {
+      this.AccountObject.Email=email;
+      this.UserFields.Email=email;
+      this.Email=email;
     },
     setUserFirstName:function(username)
     {
+      this.AccountObject.FirstName=username;
+      this.UserFields.FirstName=username;
       this.FirstName=username;
     },
     getUserFirstName:function(){
       return this.FirstName;
     },
     setUserLastName:function(lastname){
+      this.AccountObject.LastName=lastname;
+      this.UserFields.LastName=lastname;
       this.LastName=lastname;
+    },
+    setUserTelNum:function(telNum)
+    {
+      this.AccountObject.Phone=telNum;
+      this.UserFields.Phone=telNum;
+      this.Phone=telNum;
+    },
+    setUserImage:function(image)
+    {
+      this.Image=URLs.getBasicUrl()+image;
+      this.UserFields.Image=URLs.getBasicUrl()+image;
+      this.AccountObject.Image=URLs.getBasicUrl()+image;
+    },
+    updateUserField:function(field, newValue)
+    {
+      if(field=='Image')
+      {
+        this['Image']=URLs.getBasicUrl()+newValue;
+        this.UserFields.Image=URLs.getBasicUrl()+newValue;
+        this.AccountObject.Image=URLs.getBasicUrl()+newValue;
+      }else if(field=='Username')
+      {
+        this[field]=newValue;
+        this.UserFields[field]=newValue;
+        this.AccountObject[field].Value=newValue;
+        $rootScope.currentUser.Username=newValue;
+      }else{
+        this[field]=newValue;
+        this.UserFields[field]=newValue;
+        this.AccountObject[field].Value=newValue;
+      }
+
+
     },
     getUserLastName:function(){
       return this.LastName;
     },
-    setUserFields:function(fields){
+    getUserFromServer:function()
+    {
+      var r=$q.defer();
+
+      r.resolve( api.getFieldFromServer(URLs.getUserUrl(), {'Username':this.Username}));
+
+      return r.promise;
+    },
+    setUserSerNum:function(userSerNum)
+    {
+      console.log(userSerNum['UserSerNum']);
+      this.UserSerNum=userSerNum['UserSerNum'];
+    },
+    setUserFields:function(fields,username,password){
 
       this.UserFields={};
       this.FirstName=fields.FirstName;
       this.LastName=fields.LastName;
       this.Email=fields.Email;
-      this.Password=fields.Password;
-      this.Username=fields.Username;
+      this.Password=password
+      this.Username=username
       var serNum;
       if(fields.DoctorSerNum){
         serNum=fields.DoctorSerNum;
-        this.UserSerNum=fields.DoctorSerNum;
+        this.UserTypeSerNum=fields.DoctorSerNum;
         this.DoctorAriaSer=fields.DoctorAriaSer;
         this.UserRole='Doctor';
         this.UserFields.UserRole='Doctor';
-        this.UserFields.UserSerNum=fields.DoctorSerNum;
+        this.UserFields.UserTypeSerNum=fields.DoctorSerNum;
         this.Image=fields.Image;
       }else{
         serNum=fields.AdminSerNum;
-        this.UserSerNum=fields.AdminSerNum;
-        this.UserFields.UserSerNum=fields.AdminSerNum;
+        this.UserTypeSerNum=fields.AdminSerNum;
+        this.UserFields.UserTypeSerNum=fields.AdminSerNum;
         this.UserRole='Admin';
         this.UserFields.UserRole='Admin';
         this.Image='Admin image to be added';
       }
       this.Phone=fields.Phone;
       this.UserFields={
-        UserSerNum:serNum,
-        Password:fields.Password,
+        UserTypeSerNum:serNum,
+        Password:password,
         FirstName:fields.FirstName,
         LastName:fields.LastName,
         Email:fields.Email,
         DoctorAriaSer:fields.DoctorAriaSer,
         Image:fields.Image,
         Phone:fields.Phone,
-        Username:fields.Username
+        Username:username
       };
       var arrayKeys=Object.keys(this.UserFields);
       this.AccountObject={};
       for (var i = 0; i < arrayKeys.length; i++) {
-        if(arrayKeys[i]!='UserSerNum'&&arrayKeys[i]!='Password'&&arrayKeys[i]!='DoctorAriaSer'){
+        if(arrayKeys[i]!='UserTypeSerNum'&&arrayKeys[i]!='Password'&&arrayKeys[i]!='DoctorAriaSer'){
           console.log(arrayKeys[i]);
           if(arrayKeys[i]!='Image'){
             this.AccountObject[arrayKeys[i]]=
@@ -232,10 +292,13 @@ app.service('User',function(URLs, $q,api,$http){
       objectToSend={};
       objectToSend.field=field;
       objectToSend.newValue=newValue;
-      if(this.UserRole=='Doctor'){
-        objectToSend.DoctorSerNum=this.UserSerNum;
+      if(field=='Password'||field=='Username')
+      {
+        objectToSend.UserSerNum=this.UserSerNum;
+      }else if(this.UserRole=='Doctor'){
+        objectToSend.DoctorSerNum=this.UserTypeSerNum;
       }else{
-        objectToSend.AdminSerNum=this.UserSerNum;
+        objectToSend.AdminSerNum=this.UserTypeSerNum;
       }
       var url=URLs.getUpdateFieldUrl();
       var req = {
@@ -308,13 +371,13 @@ app.service('User',function(URLs, $q,api,$http){
       console.log(messages);
         var userDoctor=$rootScope.currentUser.DoctorSerNum;
         var userAdmin=$rootScope.currentUser.AdminSerNum;
-        var userSerNum;
+        var UserTypeSerNum;
         var userRole;
         if(userDoctor){
-          userSerNum=userDoctor;
+          UserTypeSerNum=userDoctor;
           userRole='Doctor';
          }else if(userAdmin){
-          userSerNum=userAdmin;
+          UserTypeSerNum=userAdmin;
           userRole='Admin';
          }
 
@@ -350,7 +413,7 @@ app.service('User',function(URLs, $q,api,$http){
           for (var i = 0; i < keysArray.length; i++) {
               var Message={};
               var message=messages[keysArray[i]];
-              if(messages[i].ReceiverRole==userRole&&messages[i].ReceiverSerNum==userSerNum)
+              if(messages[i].ReceiverRole==userRole&&messages[i].ReceiverSerNum==UserTypeSerNum)
               {
                 partnerSerNum=message.SenderSerNum;
                 key=message.SenderRole+':'+message.SenderSerNum;
@@ -412,7 +475,7 @@ app.service('User',function(URLs, $q,api,$http){
       objectToSend.MessageDate=$filter('date')(dateOfmessage,'yyyy-MM-dd HH:mm:ss');;
       objectToSend.ReceiverReadStatus=0;
       objectToSend.SenderRole=User.getUserRole();
-      objectToSend.SenderSerNum=User.getUserSerNum();
+      objectToSend.SenderSerNum=User.getUserTypeSerNum();
       objectToSend.ReceiverRole='Patient';
       objectToSend.ReceiverSerNum=patientSerNum;
       objectMessage={};
@@ -635,7 +698,12 @@ app.service('User',function(URLs, $q,api,$http){
      },
      getDocumentsUrl:function(){
        return basicURLPHP+'ObtainUserDocuments.php';
+     },
+     getUserUrl:function()
+     {
+       return basicURLPHP+'getUser.php';
      }
+
    };
 
 

@@ -48,7 +48,8 @@ app.controller('LoginModalController',function ($scope, $modalInstance,$rootScop
           if ( response.AdminSerNum ||response.DoctorSerNum)
           {
             $rootScope.alerts["LoginAlert"]={};
-            User.setUserFields(response);
+            response.Username=username;
+            User.setUserFields(response,username,password);
             User.getNumberOfPatientsForUserFromServer().then(function(data){
               $rootScope.loggedin=true;
               $rootScope.TotalNumberOfPatients=data.data[0].TotalNumberOfPatients;
@@ -62,7 +63,6 @@ app.controller('LoginModalController',function ($scope, $modalInstance,$rootScop
             });
 
             });
-
             $modalInstance.close(response);
             if(User.getUserFields().UserRole=='Admin'){
               $rootScope.admin=true;
@@ -74,12 +74,12 @@ app.controller('LoginModalController',function ($scope, $modalInstance,$rootScop
             }
 
           }
-          else if (response == "InvalidCredentials")
+          else if (response =="Invalid Password")
           {
             console.log('asdas2');
             $rootScope.alerts["LoginAlert"]={};
             $rootScope.alerts["LoginAlert"].type="danger";
-            $rootScope.alerts["LoginAlert"].message="Credentials are not valid!";
+            $rootScope.alerts["LoginAlert"].message="Password entered does not much the records";
           }
           else if ( response == "UserNotFound")
           {

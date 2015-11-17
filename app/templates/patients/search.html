@@ -6,12 +6,12 @@
         	<form class="input-group" ng-submit="findPatient()">
             <div class="input-group">
               <span class="input-group-addon" id="basic-addon1">Patient ID#</span>
-              <input type="text" ng-model="PatientId" class='form-control' ng-change="FindPatient()" ng-model-options="{debounce: 750}">
+              <input type="text" ng-model="PatientId" class='form-control' ng-change="findPatient()" ng-model-options="{debounce: 750}">
             </div>
             <br>
             <div class="input-group">
             <span class="input-group-addon" id="basic-addon1"> Last Name</span>
-            <input type="text" ng-model="LastName" class="form-control" ng-change="FindPatient()" ng-model-options="{debounce: 750}">
+            <input type="text" ng-model="LastName" class="form-control" ng-change="findPatient()" ng-model-options="{debounce: 750}">
             </div>
             <br>
             <button style="width:100%" class="btn btn-primary" type="submit">Search</button>
@@ -23,7 +23,7 @@
             <uib-alert ng-show="alert" type="{{alert.type}}"><h3>{{alert.message}}</h3></uib-alert>
            </div>
             <div ng-show="patientFound" style="width:90%">
-            	<table class="table table-bordered table-hover" >
+            	<table class="table table-bordered table-hover">
 					<th class="active" style="text-align:center">
 					Patient ID #
 					</th>
@@ -48,7 +48,7 @@
 					<th class="active">
 					</th>
 
-					<tr align="center">
+					<tr align="center" ng-repeat="patient in patients">
 					    <td>{{patient.PatientId}}</td>
 					    <td>{{patient.PatientAriaSer}}</td>
 					    <td>{{patient.FirstName}}</td>

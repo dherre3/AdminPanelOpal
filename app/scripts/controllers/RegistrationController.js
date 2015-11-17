@@ -9,7 +9,7 @@ app.controller('RegistrationController',['$scope','$http', function($scope,$http
   * @description
   * Controller for the patient registration view.
   */
-  $scope.message=" "
+  $scope.message=" ";
   $scope.patientFound=false;
   $scope.FindPatient= function (ssn) {
     /**
@@ -21,31 +21,34 @@ app.controller('RegistrationController',['$scope','$http', function($scope,$http
    * @param {Object} ssn Patient's SSN
    * @returns {String} $scope.patientFound
    */
+   
      if ($scope.SSN.length>11){
         var msURL="http://localhost:8888/qplus/AdminPanel-MySQLDB-NodeListener-Docs/php/FindPatient.php?PatientSSN="+ssn;
         $http.get(msURL).success(function(response){
           $scope.ariaResponse=response
-            });
-        if ($scope.ariaResponse!=="PatientNotFound" ) {
-          $scope.Alias="";
-          $scope.message = " ";
-          $scope.Email="";
-          $scope.EmailConfirm="";
-          $scope.PasswordConfirm="";
-          $scope.TelNumForSMS="";
-          $scope.patientFound=true;
-          var PatientSSN=$scope.SSN;
-          $scope.Language="EN";
-         } else {
-          $scope.message = "SSN was not found!\n please consult the reception.";
-          $scope.patientFound=false;
-         }
-      }else if($scope.SSN!==''){
-       $scope.patientFound=false;
-       $scope.message="SSN is invalid ! ";
-      }
 
+          if ($scope.ariaResponse!=="PatientNotFound" ) {
+            $scope.Alias="";
+            $scope.message = " ";
+            $scope.Email="";
+            $scope.EmailConfirm="";
+            $scope.PasswordConfirm="";
+            $scope.TelNumForSMS="";
+            $scope.patientFound=true;
+            var PatientSSN=$scope.SSN;
+              $scope.Language="EN";
+            }else if($scope.SSN!==''){
+             $scope.patientFound=false;
+             $scope.message="SSN is invalid ! ";
+            } else {
+              $scope.message = "SSN was not found!\n please consult the reception.";
+              $scope.patientFound=false;
+            }
+        });
+      }
   };
+
+
   $scope.Register=function()
   {
     /**
@@ -68,41 +71,41 @@ app.controller('RegistrationController',['$scope','$http', function($scope,$http
               password: $scope.Password
             },function(error,userData)
             {
-                          if (error)
-                          {
-                            switch(error.code){
-                            case "EMAIL_TAKEN": $("#firebaseError").empty();
-                            $(document).ready(function(){
-                                $("#firebaseError").append("<p class='bg-danger'>Email is already registered !</p>");
-                                });
-                            break;
-                            case "INVALID_EMAIL": $("#firebaseError").empty();
-                            $(document).ready(function(){
-                                $("#firebaseError").append("<p class='bg-danger'>Email is not valid!</p>");
-                                });
-                            break;
-                            default :
-                            $("#firebaseError").empty();
-                            $(document).ready(function()
-                            {
-                                $("#firebaseError").append("<p class='bg-danger'>An Error occured while creating user: </p>");
-                            });
-                            }
-                          } else {
-                                  // Register to MySQL
-                                  var EnableSMS=0;
-                                  if ($scope.TelNumForSMS) { EnableSMS=1;}
-                                  $scope.myURL="http://localhost:8888/qplus/AdminPanel-MySQLDB-NodeListener-Docs/php/MysqlRegister.php?PatientSerNum="
-                                  +$scope.ariaResponse[0]["PatientSerNum"]+"&PatientId="+PatientID+"&FirstName="+$scope.PatientFirstName+"&LastName="
-                                  +$scope.PatientLastName+"&TelNumForSMS="+$scope.TelNumForSMS+"&Email="+$scope.Email+"&loginID="+userData.uid+"&Password="+$scope.Password
-                                  +"&Language="+$scope.Language+"&Diagnosis="+Diagnosis+"&PatientSSN="+PatientSSN+"&Alias="+$scope.Alias+"&EnableSMS="+EnableSMS ;
-                                  $http.get($scope.myURL).success( function(result)
-                                  {
-                                  $scope.message=result;
-                                  //Send Confirmation SMS and Email with a $http request to SP
-                                  });
-                              }
-                  });
-                          }
-                        }
-                      }]);
+              if (error)
+              {
+                switch(error.code){
+                case "EMAIL_TAKEN": $("#firebaseError").empty();
+                $(document).ready(function(){
+                    $("#firebaseError").append("<p class='bg-danger'>Email is already registered !</p>");
+                    });
+                break;
+                case "INVALID_EMAIL": $("#firebaseError").empty();
+                $(document).ready(function(){
+                    $("#firebaseError").append("<p class='bg-danger'>Email is not valid!</p>");
+                    });
+                break;
+                default :
+                $("#firebaseError").empty();
+                $(document).ready(function()
+                {
+                    $("#firebaseError").append("<p class='bg-danger'>An Error occured while creating user: </p>");
+                });
+                }
+              } else {
+                // Register to MySQL
+                var EnableSMS=0;
+                if ($scope.TelNumForSMS) { EnableSMS=1;}
+                $scope.myURL="http://localhost:8888/qplus/AdminPanel-MySQLDB-NodeListener-Docs/php/MysqlRegister.php?PatientSerNum="
+                +$scope.ariaResponse[0]["PatientSerNum"]+"&PatientId="+PatientID+"&FirstName="+$scope.PatientFirstName+"&LastName="
+                +$scope.PatientLastName+"&TelNumForSMS="+$scope.TelNumForSMS+"&Email="+$scope.Email+"&loginID="+userData.uid+"&Password="+$scope.Password
+                +"&Language="+$scope.Language+"&Diagnosis="+Diagnosis+"&PatientSSN="+PatientSSN+"&Alias="+$scope.Alias+"&EnableSMS="+EnableSMS ;
+                $http.get($scope.myURL).success( function(result)
+                {
+                $scope.message=result;
+                //Send Confirmation SMS and Email with a $http request to SP
+                });
+              }
+            });
+        }
+    }
+}]);

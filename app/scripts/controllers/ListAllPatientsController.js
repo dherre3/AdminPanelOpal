@@ -4,9 +4,9 @@ app.controller('ListAllPatientsController',function (api,$scope,Patient,$state) 
 
 	var patients=api.getAllPatients();
 	patients.then(function(patients,error){
-		console.log('error');
 		console.log(error);
-		$scope.patients=patients;	
+		console.log(patients);
+		$scope.patients=patients;
 	});
 	$scope.goToPatient=function(patient)
    	{
@@ -17,6 +17,6 @@ app.controller('ListAllPatientsController',function (api,$scope,Patient,$state) 
 		window.localStorage.setItem('UserAuthorizationInfo',JSON.stringify(objectToLocalStorage));
 		$state.go('patients.patient.general');
 
-   	};	
+   	};
 
 });
